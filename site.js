@@ -54,12 +54,12 @@
   };
   const resumeUrl = safeLink(profile.resume);
   const header = document.getElementById("site-header");
-  const brand = link("", "index.html", "brand");
-  brand.append(el("span", "monogram", profile.initials));
+  const brand = link("Home", "index.html", "brand");
   brand.setAttribute("aria-label", `${profile.name} — Home`);
+  if (page === "home") brand.setAttribute("aria-current", "page");
   const nav = el("nav", "navigation");
   nav.setAttribute("aria-label", "Main navigation");
-  for (const [label, href, key] of [["Home", "index.html", "home"], ["Projects", "projects.html", "projects"]]) {
+  for (const [label, href, key] of [["Projects", "projects.html", "projects"]]) {
     const item = link(label, href);
     if (page === key || (page === "project" && key === "projects")) item.setAttribute("aria-current", "page");
     nav.append(item);
@@ -159,7 +159,42 @@
     resumeSection.append(resumeCopy, resumeUrl ? link("View resume ↗",resumeUrl,"button primary",true) : el("span","coming-soon","Resume coming soon"));
     panel.append(resumeSection);
     const connect = el("div", "about-connect"); connect.append(el("p", "small-copy", profile.availability), contact.cloneNode(true)); panel.append(connect);
-    about.append(panel);
+
+    const contactAddress = emailAddresses(profile.contactEmail || profile.email)[0] || "ethanniu79@gmail.com";
+    const contactPanel = el("section", "contact-panel"); contactPanel.id = "contact";
+    contactPanel.setAttribute("aria-labelledby", "contact-title");
+    contactPanel.append(el("p", "eyebrow", "Get in touch"));
+    const contactTitle = el("h2", "contact-title", "Send me a message."); contactTitle.id = "contact-title";
+    contactPanel.append(contactTitle, el("p", "contact-intro", "Have a question or want to connect?"));
+
+    const form = el("form", "contact-form");
+    const emailField = el("label", "contact-field");
+    emailField.append(el("span", "contact-label", "Your email"));
+    const emailInput = el("input", "contact-input");
+    emailInput.type = "email"; emailInput.name = "email"; emailInput.autocomplete = "email";
+    emailInput.placeholder = "you@example.com"; emailInput.required = true;
+    emailField.append(emailInput);
+
+    const messageField = el("label", "contact-field");
+    messageField.append(el("span", "contact-label", "Message"));
+    const messageInput = el("textarea", "contact-input contact-message");
+    messageInput.name = "message"; messageInput.rows = 6; messageInput.placeholder = "Write your message here"; messageInput.required = true;
+    messageField.append(messageInput);
+
+    const submit = el("button", "button primary contact-submit", "Send message"); submit.type = "submit";
+    const direct = el("p", "contact-direct");
+    direct.append("Or email me directly at ", link(contactAddress, "mailto:" + encodeURIComponent(contactAddress).replace(/%40/gi,"@")));
+    form.append(emailField, messageField, submit);
+    contactPanel.append(form, direct);
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const subject = "Message from your portfolio website";
+      const body = `From: ${emailInput.value.trim()}\n\n${messageInput.value.trim()}`;
+      window.location.href = `mailto:${contactAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+
+    about.append(panel, contactPanel);
     const mapCredit = safeLink(backgrounds.mapCreditUrl);
     if (backgrounds.mapCredit) about.append(mapCredit ? link(backgrounds.mapCredit,mapCredit,"map-credit",true) : el("p","map-credit",backgrounds.mapCredit));
     scene.append(stage,hero,about); main.append(scene);

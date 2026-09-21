@@ -7,7 +7,6 @@
 window.PORTFOLIO = {
   "profile": {
     "name": "Ethan Niu",
-    "initials": "EN",
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
     "introduction": "Maps, research, and projects that explore the places around us.",
@@ -26,6 +25,7 @@ window.PORTFOLIO = {
     ],
     "interests": "Outside of coursework and building maps, I love reading up on history, playing hockey and soccer, and supporting the Toronto Maple Leafs and Tottenham Hotspur. ",
     "email": "ethanniu79@gmail.com or e2niu@uwaterloo.ca",
+    "contactEmail": "ethanniu79@gmail.com",
     "linkedin": "www.linkedin.com/in/ethan-niu-1aa928310",
     "github": "ethann79",
     "Instagram": "ethnniu",
