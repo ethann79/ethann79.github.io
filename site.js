@@ -139,7 +139,7 @@
     heroCopy.append(el("p", "hero-description", profile.introduction));
     const opportunity = profile.opportunity || {};
     const opportunityLine = el("p", "hero-opportunity");
-    opportunityLine.append(opportunity.lead || "", el("strong", "", opportunity.emphasis || ""));
+    opportunityLine.append(el("strong", "", `${opportunity.lead || ""}${opportunity.emphasis || ""}`));
     if (opportunityLine.textContent.trim()) heroCopy.append(opportunityLine);
     bottom.append(heroCopy, link("View my projects", "projects.html", "button hero-button"));
     const scrollLink = link("About me ↓", "#about", "scroll-cue");
