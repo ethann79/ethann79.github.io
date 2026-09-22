@@ -10,6 +10,10 @@ window.PORTFOLIO = {
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
     "introduction": "Maps, research, and projects that explore the places around us.",
+    "opportunity": {
+      "lead": "Seeking Summer 2027 ",
+      "emphasis": "Internship Opportunities."
+    },
     "availability": "Interested in TTC, Metrolinx, BA Consulting Group, etc...",
     "about": [
       "I'm a first year student at the University of Waterloo studying Systems Design Engineering (SYDE) with an interest in public transportation, urban infastructure, map design, and SWE.",

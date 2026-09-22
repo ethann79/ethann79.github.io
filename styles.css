@@ -63,7 +63,10 @@ main { flex:1; }
 .greeting-prefix { display:block; font-size:clamp(23px,2.7vw,36px); letter-spacing:-.04em; font-weight:400; margin-bottom:9px; }
 .greeting-name { display:block; font-size:clamp(56px,7.5vw,96px); font-weight:500; letter-spacing:-.065em; line-height:1.05; }
 .hero-bottom { position:absolute; bottom:95px; left:24px; right:24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:19px; }
+.hero-copy { display:grid; justify-items:center; gap:5px; }
 .hero-description { max-width:510px; font-size:15px; line-height:1.65; margin:0; text-wrap:balance; }
+.hero-opportunity { max-width:510px; margin:0; font-size:15px; line-height:1.65; text-wrap:balance; }
+.hero-opportunity strong { font-weight:700; }
 .hero-button { background:rgba(255,255,255,.12); border-color:rgba(255,255,255,.58); color:#fff; min-width:172px; backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); transition:background-color .2s,border-color .2s; }
 .hero-button:hover { background:rgba(255,255,255,.23); color:#fff; border-color:rgba(255,255,255,.85); }
 .scroll-cue { position:absolute; right:44px; bottom:27px; font-size:12px; text-decoration:none; color:rgba(255,255,255,.88); }
@@ -206,6 +209,7 @@ body[data-page="projects"] .project-card:hover { box-shadow:0 14px 38px rgba(39,
   .greeting-name { font-size:clamp(54px,11vw,74px); }
   .hero-bottom { bottom:98px; gap:18px; }
   .hero-description { max-width:310px; font-size:13px; }
+  .hero-opportunity { max-width:310px; font-size:13px; }
   .hero-button { min-height:45px; font-size:13px; }
   .motion-toggle { left:15px; bottom:24px; font-size:11px; }
   .scroll-cue { right:23px; bottom:31px; font-size:11px; }

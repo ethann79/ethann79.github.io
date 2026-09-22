@@ -135,7 +135,13 @@
     const greeting = el("h1", "hero-greeting"); greeting.id = "hero-title";
     greeting.append(el("span", "greeting-prefix", profile.greeting || "Hello, I’m"), document.createTextNode(" "), el("span", "greeting-name", profile.name));
     const bottom = el("div", "hero-bottom");
-    bottom.append(el("p", "hero-description", profile.introduction), link("View my projects", "projects.html", "button hero-button"));
+    const heroCopy = el("div", "hero-copy");
+    heroCopy.append(el("p", "hero-description", profile.introduction));
+    const opportunity = profile.opportunity || {};
+    const opportunityLine = el("p", "hero-opportunity");
+    opportunityLine.append(opportunity.lead || "", el("strong", "", opportunity.emphasis || ""));
+    if (opportunityLine.textContent.trim()) heroCopy.append(opportunityLine);
+    bottom.append(heroCopy, link("View my projects", "projects.html", "button hero-button"));
     const scrollLink = link("About me ↓", "#about", "scroll-cue");
     const motionButton = el("button", "motion-toggle", "Pause video");
     motionButton.type = "button"; motionButton.setAttribute("aria-pressed", "false");
