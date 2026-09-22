@@ -29,7 +29,7 @@ window.PORTFOLIO = {
     "linkedin": "www.linkedin.com/in/ethan-niu-1aa928310",
     "github": "ethann79",
     "Instagram": "ethnniu",
-    "resume": "assets/Ethan-Niu-Resume.pdf",
+    "resume": "assets/Ethan-Niu-Resume.pdf?v=20260921-3",
     "greeting": "Hello, I’m"
   },
   "projects": [

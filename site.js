@@ -32,7 +32,7 @@
         return url.href;
       } catch { return ""; }
     }
-    if (/^(?:\.\/)?assets\/[a-z0-9_./ -]+$/i.test(trimmed) && !trimmed.includes("..")) return trimmed;
+    if (/^(?:\.\/)?assets\/[a-z0-9_./ -]+(?:\?v=[a-z0-9_-]+)?$/i.test(trimmed) && !trimmed.includes("..")) return trimmed;
     return "";
   };
   const socialLink = (value, service) => {
