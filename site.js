@@ -133,7 +133,26 @@
     const hero = el("section", "video-hero");
     hero.setAttribute("aria-labelledby", "hero-title");
     const greeting = el("h1", "hero-greeting"); greeting.id = "hero-title";
-    greeting.append(el("span", "greeting-prefix", profile.greeting || "Hello, I’m"), document.createTextNode(" "), el("span", "greeting-name", profile.name));
+    const greetingText = profile.greeting || "Hello, I’m";
+    const portraitUrl = safeLink(profile.portrait);
+    if (portraitUrl) {
+      const greetingParts = greetingText.match(/^(.*?)(I[’']m)\s*$/i);
+      const greetingLead = greetingParts ? greetingParts[1].trim() : greetingText;
+      const greetingJoiner = greetingParts ? greetingParts[2] : "";
+      const portraitFrame = el("span", "hero-portrait-frame");
+      portraitFrame.setAttribute("aria-hidden", "true");
+      const portrait = el("img", "hero-portrait");
+      portrait.alt = ""; portrait.src = portraitUrl; portrait.decoding = "async"; portrait.fetchPriority = "high";
+      portraitFrame.append(portrait);
+      greeting.classList.add("has-portrait");
+      greeting.append(
+        el("span", "greeting-prefix", greetingLead),
+        portraitFrame,
+        el("span", "greeting-name", [greetingJoiner,profile.name].filter(Boolean).join(" "))
+      );
+    } else {
+      greeting.append(el("span", "greeting-prefix", greetingText), document.createTextNode(" "), el("span", "greeting-name", profile.name));
+    }
     const bottom = el("div", "hero-bottom");
     const heroCopy = el("div", "hero-copy");
     heroCopy.append(el("p", "hero-description", profile.introduction));

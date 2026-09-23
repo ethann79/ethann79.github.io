@@ -7,6 +7,7 @@
 window.PORTFOLIO = {
   "profile": {
     "name": "Ethan Niu",
+    "portrait": "assets/ethan-portrait.jpg?v=20260922-5",
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
     "introduction": "Maps, research, and projects that explore the places around us.",
@@ -39,7 +40,7 @@ window.PORTFOLIO = {
   "projects": [
     {
       "id": "map-project-one",
-      "title": "Project One",
+      "title": "Toronto Accessibility Heatmap",
       "category": "Mapping",
       "year": "2026",
       "summary": "An accessibility heatmap of Toronto based on five major amenities, with ongoing population analysis to estimate how many residents live in under-served areas.",
@@ -63,7 +64,7 @@ window.PORTFOLIO = {
     },
     {
       "id": "map-project-two",
-      "title": "Project Two",
+      "title": "Toronto Subway & LRT Redesign",
       "category": "Mapping",
       "year": "2025",
       "summary": "Inspired by trips to public transit oriented cities such as Munich and Tokyo, this project envisions a what if scenario where Toronto invested heavily in subways and light rail.",
