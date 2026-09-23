@@ -24,6 +24,8 @@ window.PORTFOLIO = {
     "studyPeriod": "First Year",
     "skills": [
       "Spatial Analysis",
+      "Java",
+      "C++",
       "GIS and Cartography",
       "AI Skills",
       "Front-End Development"
