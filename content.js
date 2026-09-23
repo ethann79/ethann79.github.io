@@ -28,7 +28,7 @@ window.PORTFOLIO = {
       "AI Skills",
       "Front-End Development"
     ],
-    "interests": "Outside of coursework and building maps, I love reading up on history, playing hockey and soccer, and supporting the Toronto Maple Leafs and Tottenham Hotspur. ",
+    "interests": "Outside of coursework and building maps, I love side-questing by attending random events, reading up on history, and playing hockey or badminton. I'm also an avid hockey and soccer fan, so feel free to reach out below!",
     "email": "ethanniu79@gmail.com or e2niu@uwaterloo.ca",
     "contactEmail": "ethanniu79@gmail.com",
     "linkedin": "www.linkedin.com/in/ethan-niu-1aa928310",

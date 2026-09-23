@@ -177,7 +177,7 @@
     const skills = el("section", ""); skills.append(el("h3", "eyebrow", "Skills & interests"));
     const skillList = el("ul", "skill-list"); (profile.skills || []).forEach(skill => skillList.append(el("li", "skill-chip", skill))); skills.append(skillList);
     detailGrid.append(education,skills); panel.append(detailGrid);
-    const interests = el("section", "interests-section"); interests.append(el("h3", "eyebrow", "Away from my desk"), el("p", "body-copy", profile.interests)); panel.append(interests);
+    const interests = el("section", "interests-section"); interests.append(el("h3", "eyebrow", "Hobbies and Interests"), el("p", "body-copy", profile.interests)); panel.append(interests);
     const resumeSection = el("section", "resume-panel"); resumeSection.id = "resume";
     const resumeCopy = el("div", ""); resumeCopy.append(el("h3", "section-title", "The resume version."));
     if (resumeUrl) resumeCopy.append(el("p", "small-copy muted", "My education, experience, and skills in one place."));
