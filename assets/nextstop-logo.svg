@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" role="img" aria-labelledby="title desc">
+  <title id="title">Nextstop</title>
+  <desc id="desc">The Nextstop wordmark on a dark green background.</desc>
+  <rect width="1600" height="1100" fill="#142026"/>
+  <g fill="none" stroke="#e6edeb" stroke-linecap="round" opacity="0.08">
+    <path d="M-120 800 C220 800 220 300 560 300 S900 800 1240 800 S1580 300 1720 300" stroke-width="18"/>
+    <path d="M-100 880 C260 880 260 380 600 380 S940 880 1280 880 S1620 380 1740 380" stroke-width="5"/>
+  </g>
+  <g font-family="Inter, Arial, Helvetica, sans-serif" font-weight="750" fill="#e6edeb">
+    <text x="800" y="575" text-anchor="middle" font-size="176" letter-spacing="-8">n<tspan fill="#ff9464">.</tspan> nextstop</text>
+  </g>
+</svg>
