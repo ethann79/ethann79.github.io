@@ -85,6 +85,28 @@ window.PORTFOLIO = {
       "pdf": "",
       "liveUrl": "",
       "sourceUrl": ""
+    },
+    {
+      "id": "nextstop-game",
+      "title": "Nextstop Game",
+      "category": "Game",
+      "year": "2026",
+      "summary": "A Toronto transit planning game about choosing projects and shaping the city's network over the next fifty years.",
+      "cardSummary": "A Toronto transit planning game about choosing projects and shaping the city's network over the next fifty years.",
+      "image": "assets/nextstop-logo.svg",
+      "previewImage": "assets/nextstop-logo.svg",
+      "imageAlt": "Nextstop wordmark on a dark green background",
+      "caption": "Nextstop — a Toronto transit planning game.",
+      "tools": [
+        "Front-End Development"
+      ],
+      "context": "Partner Project",
+      "overview": "",
+      "process": "",
+      "outcome": "",
+      "pdf": "",
+      "liveUrl": "https://nextstoptoronto.vercel.app/",
+      "sourceUrl": ""
     }
   ],
   "backgrounds": {
