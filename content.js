@@ -51,7 +51,7 @@ window.PORTFOLIO = {
       "previewImage": "assets/toronto-accessibility-heatmap-preview.jpg",
       "imageAlt": "Toronto accessibility heatmap showing access to five major amenities and under-served areas",
       "caption": "Interactive Toronto accessibility heatmap based on subway stations, supermarkets, hospitals, schools, and community centres. Click any dissemination area to view its accessibility tier, population, mean score, land area, and population density.",
-      "interactiveMap": "assets/project-one-map/index.html?v=20260929-1",
+      "interactiveMap": "assets/project-one-map/index.html?v=20260929-2",
       "tools": [
         "QGIS and Google Sheets",
         "Spatial Analysis"
