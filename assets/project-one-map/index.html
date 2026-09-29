@@ -7,6 +7,7 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
@@ -17,14 +18,111 @@
             padding: 0;
             margin: 0;
         }
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .leaflet-popup-content-wrapper {
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+        }
+        .leaflet-popup-content {
+            min-width: 248px;
+            margin: 16px 18px;
+        }
+        .da-popup__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .da-popup__title {
+            margin: 0;
+            color: #172033;
+            font-size: 16px;
+            line-height: 1.25;
+        }
+        .tier-badge {
+            flex: 0 0 auto;
+            border-radius: 999px;
+            padding: 4px 9px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .tier-badge--low { background: #c94747; }
+        .tier-badge--medium { background: #b47a00; }
+        .tier-badge--high { background: #287a54; }
+        .tier-badge--unknown { background: #667085; }
+        .da-popup__grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px 18px;
+            margin: 0;
+        }
+        .da-popup__grid dt {
+            color: #667085;
+            font-size: 12px;
+        }
+        .da-popup__grid dd {
+            margin: 0;
+            color: #172033;
+            font-size: 13px;
+            font-weight: 650;
+            text-align: right;
+        }
+        .map-key {
+            max-width: 190px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            border-radius: 12px;
+            padding: 11px 13px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+            color: #172033;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+        .map-key strong {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+        }
+        .map-key__row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 4px;
+        }
+        .map-key__swatch {
+            width: 11px;
+            height: 11px;
+            border: 1px solid rgba(15, 23, 42, 0.28);
+            border-radius: 3px;
+        }
+        .map-key__hint {
+            margin: 8px 0 0;
+            color: #667085;
+        }
+        @media (max-width: 640px) {
+            .map-key {
+                max-width: 150px;
+                padding: 9px 10px;
+            }
+            .leaflet-popup-content {
+                min-width: 220px;
+            }
+        }
         </style>
-        <title>Toronto Accessibility Map — Ethan Niu</title>
+        <title>Toronto Accessibility Heatmap — Ethan Niu</title>
     </head>
     <body>
         <div id="map">
         </div>
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
         <script src="js/leaflet.rotatedMarker.js"></script>
         <script src="js/leaflet.pattern.js"></script>
         <script src="js/leaflet-hash.js"></script>
@@ -33,7 +131,7 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/leaflet.photon.js"></script>
-        <script src="data/Neighbourhoods4326_1.js"></script>
+        <script src="data/zonal_statistics_3.js"></script>
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
@@ -41,6 +139,49 @@
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var populationField = 'population_2021';
+        var wholeNumber = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 0 });
+        var decimalNumber = new Intl.NumberFormat('en-CA', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function tierColour(tier) {
+            if (tier === 'High') return '#3a9d6f';
+            if (tier === 'Medium') return '#e0a528';
+            if (tier === 'Low') return '#d75a5a';
+            return '#8090a5';
+        }
+
+        function buildDaPopup(properties) {
+            var tier = properties.access_tier || 'Unknown';
+            var population = Number(properties[populationField]);
+            var meanScore = Number(properties.mean_score);
+            var landArea = Number(properties.LANDAREA);
+            var density = Number.isFinite(population) && Number.isFinite(landArea) && landArea > 0
+                ? population / landArea
+                : null;
+            var tierClass = ['Low', 'Medium', 'High'].indexOf(tier) >= 0 ? tier.toLowerCase() : 'unknown';
+
+            return '<section class="da-popup" aria-label="Dissemination area ' + escapeHtml(properties.DAUID) + '">' +
+                '<div class="da-popup__header">' +
+                    '<h2 class="da-popup__title">DA ' + escapeHtml(properties.DAUID) + '</h2>' +
+                    '<span class="tier-badge tier-badge--' + tierClass + '">' + escapeHtml(tier) + ' access</span>' +
+                '</div>' +
+                '<dl class="da-popup__grid">' +
+                    '<dt>Population (2021)</dt><dd>' + (Number.isFinite(population) ? wholeNumber.format(population) : 'Not available') + '</dd>' +
+                    '<dt>Mean accessibility score</dt><dd>' + (Number.isFinite(meanScore) ? decimalNumber.format(meanScore) : 'Not available') + '</dd>' +
+                    '<dt>Land area</dt><dd>' + (Number.isFinite(landArea) ? landArea.toFixed(3) + ' km²' : 'Not available') + '</dd>' +
+                    '<dt>Population density</dt><dd>' + (density !== null ? wholeNumber.format(density) + ' / km²' : 'Not available') + '</dd>' +
+                '</dl>' +
+            '</section>';
+        }
         // remove popup's row if "visible-with-data"
         function removeEmptyRowsFromPopupContent(content, feature) {
          var tempDiv = document.createElement('div');
@@ -132,76 +273,6 @@
         });
         layer_OSMStandard_0;
         map.addLayer(layer_OSMStandard_0);
-        function pop_Neighbourhoods4326_1(feature, layer) {
-            var popupContent = '<table>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['_id1'] !== null ? autolinker.link(String(feature.properties['_id1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_ID2'] !== null ? autolinker.link(String(feature.properties['AREA_ID2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_AT3'] !== null ? autolinker.link(String(feature.properties['AREA_AT3']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['PARENT_4'] !== null ? autolinker.link(String(feature.properties['PARENT_4']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_SH5'] !== null ? autolinker.link(String(feature.properties['AREA_SH5']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_LO6'] !== null ? autolinker.link(String(feature.properties['AREA_LO6']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_NA7'] !== null ? autolinker.link(String(feature.properties['AREA_NA7']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['AREA_DE8'] !== null ? autolinker.link(String(feature.properties['AREA_DE8']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['CLASSIF9'] !== null ? autolinker.link(String(feature.properties['CLASSIF9']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['CLASSIF10'] !== null ? autolinker.link(String(feature.properties['CLASSIF10']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <td colspan="2">' + (feature.properties['OBJECTI11'] !== null ? autolinker.link(String(feature.properties['OBJECTI11']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
-                    </tr>\
-                </table>';
-            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-			layer.on('popupopen', function(e) {
-				addClassToPopupIfMedia(content, e.popup);
-			});
-			layer.bindPopup(content, { maxHeight: 400 });
-        }
-
-        function style_Neighbourhoods4326_1_0() {
-            return {
-                pane: 'pane_Neighbourhoods4326_1',
-                opacity: 1,
-                color: 'rgba(53,121,177,1.0)',
-                dashArray: '',
-                lineCap: 'square',
-                lineJoin: 'bevel',
-                weight: 4.0,
-                fillOpacity: 0,
-                interactive: true,
-            }
-        }
-        map.createPane('pane_Neighbourhoods4326_1');
-        map.getPane('pane_Neighbourhoods4326_1').style.zIndex = 401;
-        map.getPane('pane_Neighbourhoods4326_1').style['mix-blend-mode'] = 'normal';
-        var layer_Neighbourhoods4326_1 = new L.geoJson(json_Neighbourhoods4326_1, {
-            attribution: '',
-            interactive: true,
-            dataVar: 'json_Neighbourhoods4326_1',
-            layerName: 'layer_Neighbourhoods4326_1',
-            pane: 'pane_Neighbourhoods4326_1',
-            onEachFeature: pop_Neighbourhoods4326_1,
-            style: style_Neighbourhoods4326_1_0,
-        });
-        bounds_group.addLayer(layer_Neighbourhoods4326_1);
-        map.addLayer(layer_Neighbourhoods4326_1);
         map.createPane('pane_final_clipped_weighted_layer_2');
         map.getPane('pane_final_clipped_weighted_layer_2').style.zIndex = 402;
         var img_final_clipped_weighted_layer_2 = 'data/final_clipped_weighted_layer_2.png';
@@ -211,6 +282,64 @@
                                               {pane: 'pane_final_clipped_weighted_layer_2'});
         bounds_group.addLayer(layer_final_clipped_weighted_layer_2);
         map.addLayer(layer_final_clipped_weighted_layer_2);
+        function pop_zonal_statistics_3(feature, layer) {
+            var content = buildDaPopup(feature.properties);
+            layer.bindPopup(content, { maxHeight: 400, maxWidth: 340 });
+            layer.on({
+                mouseover: function (event) {
+                    event.target.setStyle({ weight: 2, fillOpacity: 0.38 });
+                    event.target.bringToFront();
+                },
+                mouseout: function (event) {
+                    layer_zonal_statistics_3.resetStyle(event.target);
+                }
+            });
+        }
+
+        function style_zonal_statistics_3_0(feature) {
+            return {
+                pane: 'pane_zonal_statistics_3',
+                opacity: 1,
+                color: 'rgba(23,32,51,0.42)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.65,
+                fill: true,
+                fillOpacity: 0.18,
+                fillColor: tierColour(feature.properties.access_tier),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_zonal_statistics_3');
+        map.getPane('pane_zonal_statistics_3').style.zIndex = 403;
+        map.getPane('pane_zonal_statistics_3').style['mix-blend-mode'] = 'normal';
+        var layer_zonal_statistics_3 = new L.geoJson(json_zonal_statistics_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_zonal_statistics_3',
+            layerName: 'layer_zonal_statistics_3',
+            pane: 'pane_zonal_statistics_3',
+            onEachFeature: pop_zonal_statistics_3,
+            style: style_zonal_statistics_3_0,
+        });
+        bounds_group.addLayer(layer_zonal_statistics_3);
+        map.addLayer(layer_zonal_statistics_3);
+        var accessibilityKey = L.control({ position: 'bottomright' });
+        accessibilityKey.onAdd = function () {
+            var container = L.DomUtil.create('div', 'map-key');
+            container.setAttribute('role', 'note');
+            container.innerHTML =
+                '<strong>Accessibility tier</strong>' +
+                '<div class="map-key__row"><span class="map-key__swatch" style="background:#3a9d6f"></span>High</div>' +
+                '<div class="map-key__row"><span class="map-key__swatch" style="background:#e0a528"></span>Medium</div>' +
+                '<div class="map-key__row"><span class="map-key__swatch" style="background:#d75a5a"></span>Low</div>' +
+                '<p class="map-key__hint">Click any dissemination area to view its population and score.</p>';
+            L.DomEvent.disableClickPropagation(container);
+            L.DomEvent.disableScrollPropagation(container);
+            return container;
+        };
+        accessibilityKey.addTo(map);
         setBounds();
         L.ImageOverlay.include({
             getBounds: function () {
