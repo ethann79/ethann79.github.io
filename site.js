@@ -453,12 +453,12 @@
     const frame = el("div", "project-media detail-media embedded-map");
     const toolbar = el("div", "map-viewer-toolbar");
     toolbar.append(
-      el("span", "map-viewer-hint", "Drag the map to move · scroll or use the map controls to zoom"),
+      el("span", "map-viewer-hint", "Click a DA for details · drag to move · scroll or use controls to zoom"),
       link("Open full map ↗", src, "full-map-link", true)
     );
     const map = el("iframe", "interactive-map-embed");
     map.title = `Interactive Toronto accessibility map for ${project.title}`;
-    map.loading = "eager";
+    map.loading = "lazy";
     map.src = src;
     frame.append(toolbar, map);
     return frame;
