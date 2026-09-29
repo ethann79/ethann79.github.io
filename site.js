@@ -478,8 +478,11 @@
       image.addEventListener("error", () => frame.replaceChildren(makePlaceholder(project, index, true)), { once: true });
       image.src = src;
       if (detailed) {
-        const full = link("", src, "full-image", true);
-        full.setAttribute("aria-label", `Open full-size image for ${project.title} (new tab)`);
+        const imageLink = safeLink(project.imageLink) || src;
+        const full = link("", imageLink, "full-image", true);
+        full.setAttribute("aria-label", project.imageLink
+          ? `Open ${project.title} live project (new tab)`
+          : `Open full-size image for ${project.title} (new tab)`);
         full.append(image);
         frame.append(full);
       } else frame.append(image);
