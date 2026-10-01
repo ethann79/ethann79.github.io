@@ -7,7 +7,7 @@
 window.PORTFOLIO = {
   "profile": {
     "name": "Ethan Niu",
-    "portrait": "assets/ethan-portrait.jpg?v=20260922-5",
+    "portrait": "assets/ethan-portrait-graduation.svg?v=20260930-1",
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
     "introduction": "Maps, research, and projects that explore the places around us.",
