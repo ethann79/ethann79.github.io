@@ -27,7 +27,7 @@ window.PORTFOLIO = {
       "Spatial Analysis",
       "Java",
       "C++",
-      "GIS and Cartography",
+      "Geographic Information System (GIS)",
       "AI Skills",
       "Front-End Development"
     ],
