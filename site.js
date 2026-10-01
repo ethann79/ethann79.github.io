@@ -54,12 +54,15 @@
   };
   const resumeUrl = safeLink(profile.resume);
   const header = document.getElementById("site-header");
-  const brand = link("Home", "index.html", "brand");
-  brand.setAttribute("aria-label", `${profile.name} — Home`);
+  const brand = link(profile.chineseName || "牛", "index.html", "brand");
+  brand.setAttribute("aria-label", `${profile.chineseName || "牛"} — ${profile.name}, Home`);
   if (page === "home") brand.setAttribute("aria-current", "page");
   const nav = el("nav", "navigation");
   nav.setAttribute("aria-label", "Main navigation");
-  for (const [label, href, key] of [["Projects", "projects.html", "projects"]]) {
+  for (const [label, href, key] of [
+    ["Projects", "projects.html", "projects"],
+    ["About Me", "index.html#about", "about"]
+  ]) {
     const item = link(label, href);
     if (page === key || (page === "project" && key === "projects")) item.setAttribute("aria-current", "page");
     nav.append(item);
@@ -85,7 +88,40 @@
     if (href) contact.append(link(label,href,"",true));
   }
   if (!contact.childElementCount) contact.append(el("span", "muted", "Your contact links will appear here"));
-  footer.append(contact);
+  const icon = name => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "social-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    const icons = {
+      email: '<path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/>',
+      linkedin: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 10v7M8 7v.01M12 17v-7M12 13.25A3.25 3.25 0 0 1 18.5 13.25V17"/>',
+      instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".75" class="social-icon-dot"/>',
+      github: '<path class="social-icon-fill" d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.23.7-3.91-1.37-3.91-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.72 1.27 3.39.97.1-.75.41-1.27.74-1.56-2.58-.29-5.29-1.29-5.29-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.19-1.49 3.15-1.18 3.15-1.18.63 1.58.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.72 5.39-5.3 5.68.42.36.79 1.07.79 2.16v3.21c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .7Z"/>'
+    };
+    svg.innerHTML = icons[name] || "";
+    return svg;
+  };
+  const iconLink = (label, href, iconName, external = false) => {
+    const item = link("", href, "social-icon-link", external);
+    item.setAttribute("aria-label", label);
+    item.title = label;
+    item.append(icon(iconName));
+    return item;
+  };
+  const footerSocials = el("div", "footer-socials");
+  const primaryEmail = emailAddresses(profile.contactEmail || profile.email)[0];
+  const footerItems = [
+    ["GitHub", socialLink(profile.github, "github"), "github", true],
+    ["LinkedIn", socialLink(profile.linkedin, "linkedin"), "linkedin", true],
+    ["Email", primaryEmail ? "mailto:" + encodeURIComponent(primaryEmail).replace(/%40/gi,"@") : "", "email", false],
+    ["Instagram", socialLink(profile.instagram || profile.Instagram, "instagram"), "instagram", true]
+  ];
+  for (const [label, href, iconName, external] of footerItems) {
+    if (href) footerSocials.append(iconLink(label, href, iconName, external));
+  }
+  if (footerSocials.childElementCount) footer.append(footerSocials);
 
   const setMeta = (key, value, property = false) => {
     const attribute = property ? "property" : "name";
@@ -161,7 +197,7 @@
     opportunityLine.append(el("strong", "", `${opportunity.lead || ""}${opportunity.emphasis || ""}`));
     if (opportunityLine.textContent.trim()) heroCopy.append(opportunityLine);
     bottom.append(heroCopy, link("View my projects", "projects.html", "button hero-button"));
-    const scrollLink = link("About me ↓", "#about", "scroll-cue");
+    const scrollLink = link("About Me ↓", "#about", "scroll-cue");
     const motionButton = el("button", "motion-toggle", "Pause video");
     motionButton.type = "button"; motionButton.setAttribute("aria-pressed", "false");
     hero.append(greeting, bottom, scrollLink, motionButton);
