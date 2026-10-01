@@ -7,6 +7,7 @@
 window.PORTFOLIO = {
   "profile": {
     "name": "Ethan Niu",
+    "chineseName": "牛",
     "portrait": "assets/ethan-portrait-graduation.svg?v=20260930-1",
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
