@@ -61,33 +61,17 @@
   nav.setAttribute("aria-label", "Main navigation");
   for (const [label, href, key] of [
     ["Projects", "projects.html", "projects"],
-    ["About Me", "index.html#about", "about"]
+    ["About Me", "about.html", "about"]
   ]) {
     const item = link(label, href);
     if (page === key || (page === "project" && key === "projects")) item.setAttribute("aria-current", "page");
     nav.append(item);
   }
-  const resume = link("Resume ↗", resumeUrl || "index.html#resume", "resume-nav", Boolean(resumeUrl));
+  const resume = link("Resume ↗", resumeUrl || "about.html#resume", "resume-nav", Boolean(resumeUrl));
   if (resumeUrl) resume.setAttribute("aria-label", "Open resume (new tab)");
   header.append(brand, nav, resume);
   const footer = document.getElementById("site-footer");
   footer.append(el("span", "footer-credit", `${profile.name} · Portfolio`));
-  const contact = el("div", "footer-links");
-  const addresses = emailAddresses(profile.email);
-  addresses.forEach(address => {
-    const label = addresses.length === 1 ? "Email ↗" : address + " ↗";
-    const href = "mailto:" + encodeURIComponent(address).replace(/%40/gi,"@");
-    contact.append(link(label,href));
-  });
-  for (const [label, value, service] of [
-    ["LinkedIn ↗", profile.linkedin, "linkedin"],
-    ["GitHub ↗", profile.github, "github"],
-    ["Instagram ↗", profile.instagram || profile.Instagram, "instagram"]
-  ]) {
-    const href = socialLink(value,service);
-    if (href) contact.append(link(label,href,"",true));
-  }
-  if (!contact.childElementCount) contact.append(el("span", "muted", "Your contact links will appear here"));
   const icon = name => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("class", "social-icon");
@@ -148,11 +132,18 @@
     const scene = el("div", "home-scene");
     const stage = el("div", "background-stage");
     stage.setAttribute("aria-hidden", "true");
-    const mapLayer = el("div", "map-layer");
-    const mapImage = el("img", "map-background");
-    mapImage.alt = ""; mapImage.src = safeLink(backgrounds.map); mapImage.decoding = "async";
-    mapImage.style.objectPosition = backgrounds.mapPosition || "50% 50%";
-    mapLayer.append(mapImage, el("div", "map-wash"));
+    const factsVideoLayer = el("div", "facts-video-layer");
+    const factsPoster = el("img", "facts-video-poster");
+    factsPoster.alt = ""; factsPoster.src = safeLink(backgrounds.factsPoster); factsPoster.decoding = "async";
+    factsPoster.style.objectPosition = backgrounds.factsVideoPosition || "50% 50%";
+    const factsVideo = el("video", "facts-video");
+    factsVideo.muted = true; factsVideo.defaultMuted = true; factsVideo.loop = true; factsVideo.playsInline = true;
+    factsVideo.setAttribute("muted", ""); factsVideo.setAttribute("playsinline", "");
+    factsVideo.setAttribute("aria-hidden", "true"); factsVideo.tabIndex = -1;
+    factsVideo.preload = "metadata"; factsVideo.disablePictureInPicture = true;
+    factsVideo.poster = safeLink(backgrounds.factsPoster);
+    factsVideo.style.objectPosition = backgrounds.factsVideoPosition || "50% 50%";
+    factsVideoLayer.append(factsPoster, factsVideo, el("div", "facts-video-shade"));
     const videoLayer = el("div", "video-layer");
     const poster = el("img", "video-poster");
     poster.alt = ""; poster.src = safeLink(backgrounds.poster); poster.fetchPriority = "high";
@@ -165,7 +156,7 @@
     video.poster = safeLink(backgrounds.poster);
     video.style.objectPosition = backgrounds.videoPosition || "50% 50%";
     videoLayer.append(poster, video, el("div", "video-shade"));
-    stage.append(mapLayer, videoLayer);
+    stage.append(factsVideoLayer, videoLayer);
     const hero = el("section", "video-hero");
     hero.setAttribute("aria-labelledby", "hero-title");
     const greeting = el("h1", "hero-greeting"); greeting.id = "hero-title";
@@ -197,54 +188,266 @@
     opportunityLine.append(el("strong", "", `${opportunity.lead || ""}${opportunity.emphasis || ""}`));
     if (opportunityLine.textContent.trim()) heroCopy.append(opportunityLine);
     bottom.append(heroCopy, link("View my projects", "projects.html", "button hero-button"));
-    const scrollLink = link("About Me ↓", "#about", "scroll-cue");
+    const scrollLink = link("Quick facts ↓", "#quick-facts", "scroll-cue");
     const motionButton = el("button", "motion-toggle", "Pause video");
     motionButton.type = "button"; motionButton.setAttribute("aria-pressed", "false");
     hero.append(greeting, bottom, scrollLink, motionButton);
-    const about = el("section", "home-about"); about.id = "about";
-    about.setAttribute("aria-labelledby", "about-title");
-    const panel = el("div", "about-panel");
-    panel.append(el("p", "eyebrow", "A little more about me"));
-    const aboutTitle = el("h2", "about-title", "Beyond the projects."); aboutTitle.id = "about-title"; panel.append(aboutTitle);
-    panel.append(el("p", "about-study", `${profile.program} / ${profile.university}`));
-    (profile.about || []).forEach(text => panel.append(el("p", "body-copy", text)));
-    const detailGrid = el("div", "about-detail-grid");
-    const education = el("section", ""); education.append(el("h3", "eyebrow", "Education"), el("p", "education-title", profile.education), el("p", "small-copy", profile.studyPeriod));
-    const skills = el("section", ""); skills.append(el("h3", "eyebrow", "Skills & interests"));
-    const skillList = el("ul", "skill-list"); (profile.skills || []).forEach(skill => skillList.append(el("li", "skill-chip", skill))); skills.append(skillList);
-    detailGrid.append(education,skills); panel.append(detailGrid);
-    const interests = el("section", "interests-section"); interests.append(el("h3", "eyebrow", "Hobbies and Interests"), el("p", "body-copy", profile.interests)); panel.append(interests);
-    const resumeSection = el("section", "resume-panel"); resumeSection.id = "resume";
-    const resumeCopy = el("div", ""); resumeCopy.append(el("h3", "section-title", "The resume version."));
-    if (resumeUrl) resumeCopy.append(el("p", "small-copy muted", "My education, experience, and skills in one place."));
-    resumeSection.append(resumeCopy, resumeUrl ? link("View resume ↗",resumeUrl,"button primary",true) : el("span","coming-soon","Resume coming soon"));
-    panel.append(resumeSection);
-    const connect = el("div", "about-connect"); connect.append(el("p", "small-copy", profile.availability), contact.cloneNode(true)); panel.append(connect);
+    const facts = el("section", "home-facts"); facts.id = "quick-facts";
+    facts.setAttribute("aria-label", "Quick facts");
+    const factsPanel = el("div", "quick-facts-panel");
+    const factList = el("ul", "quick-facts-list");
+    const factItems = Array.isArray(profile.quickFacts) ? profile.quickFacts : [];
+    factItems.forEach(fact => {
+      const item = el("li", "");
+      if (typeof fact === "string") {
+        item.textContent = fact;
+      } else if (fact && typeof fact === "object" && typeof fact.projectId === "string" && typeof fact.linkText === "string") {
+        item.append(
+          typeof fact.before === "string" ? fact.before : "",
+          link(fact.linkText, `project.html?id=${encodeURIComponent(fact.projectId)}`, "quick-fact-link"),
+          typeof fact.after === "string" ? fact.after : ""
+        );
+      }
+      if (item.textContent.trim()) factList.append(item);
+    });
+    factsPanel.append(factList);
+    facts.append(factsPanel);
+    const footer = document.getElementById("site-footer");
+    if (footer) facts.append(footer);
+    scene.append(stage,hero,facts); main.append(scene);
 
+    // Native scrolling crossfades the Waterloo hero video into the Tokyo quick-facts video.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const saveData = Boolean(navigator.connection && navigator.connection.saveData);
+    const revealStart = Number(backgrounds.heroRevealStart) || 3.8;
+    const revealEnd = Math.max(revealStart + .25,Number(backgrounds.heroRevealEnd) || 5.75);
+    const heroLoopEnd = Number(backgrounds.heroLoopEnd) || 0;
+    let introRevealActive = !reducedMotion.matches && !saveData;
+    let introRevealFrame = 0;
+    let heroLoopFrame = 0;
+    let userPaused = false;
+    let userOptedIn = false;
+    let frameRequested = false;
+    let heroHeight = hero.offsetHeight;
+    let sceneTop = scene.getBoundingClientRect().top + window.scrollY;
+    let heroOnScreen = true;
+    let factsOnScreen = false;
+    if (introRevealActive) {
+      hero.classList.add("intro-reveal-waiting");
+      document.body.classList.add("home-intro-waiting");
+      document.documentElement.classList.add("home-intro-locked");
+      window.scrollTo(0,0);
+      requestAnimationFrame(() => { if (introRevealActive) window.scrollTo(0,0); });
+    }
+
+    const motionAllowed = () => (!reducedMotion.matches && !saveData) || userOptedIn;
+    const heroMedia = { element:video, source:safeLink(backgrounds.video), loaded:false, failed:false, pending:false, attempt:0, wanted:null };
+    const factsMedia = { element:factsVideo, source:safeLink(backgrounds.factsVideo), loaded:false, failed:false, pending:false, attempt:0, wanted:null };
+    const mediaStates = [heroMedia,factsMedia];
+
+    const finishIntroReveal = () => {
+      if (!introRevealActive) return;
+      introRevealActive = false;
+      cancelAnimationFrame(introRevealFrame);
+      introRevealFrame = 0;
+      greeting.style.clipPath = "";
+      hero.classList.remove("intro-reveal-waiting");
+      hero.classList.add("intro-reveal-complete");
+      document.body.classList.remove("home-intro-waiting");
+      document.body.classList.add("home-intro-complete");
+      document.documentElement.classList.remove("home-intro-locked");
+    };
+    const syncGreetingToVideo = () => {
+      if (!introRevealActive) return;
+      const current = video.currentTime;
+      if (current >= revealEnd) { finishIntroReveal(); return; }
+      if (current <= revealStart) {
+        greeting.style.clipPath = "inset(0 100% 0 0)";
+      } else {
+        const sourceWidth = video.videoWidth || 1600;
+        const sourceHeight = video.videoHeight || 900;
+        const progress = Math.max(0,Math.min(1,(current-revealStart)/(revealEnd-revealStart)));
+        const scale = Math.max(hero.clientWidth/sourceWidth,hero.clientHeight/sourceHeight);
+        const cropLeft = Math.max(0,(sourceWidth*scale-hero.clientWidth)/2);
+        const trainTail = sourceWidth*progress*scale-cropLeft;
+        const greetingBounds = greeting.getBoundingClientRect();
+        const revealed = Math.max(0,Math.min(1,(trainTail-greetingBounds.left)/Math.max(1,greetingBounds.width)));
+        greeting.style.clipPath = `inset(0 ${(1-revealed)*100}% 0 0)`;
+      }
+      introRevealFrame = requestAnimationFrame(syncGreetingToVideo);
+    };
+    const startIntroReveal = () => {
+      if (introRevealActive && !introRevealFrame) introRevealFrame = requestAnimationFrame(syncGreetingToVideo);
+    };
+    const keepHeroLoopClean = () => {
+      if (heroLoopEnd > 0 && Number.isFinite(video.duration) && video.currentTime >= Math.min(heroLoopEnd,video.duration)) {
+        video.currentTime = 0;
+      }
+      heroLoopFrame = requestAnimationFrame(keepHeroLoopClean);
+    };
+    const startHeroLoopWatcher = () => {
+      if (heroLoopEnd > 0 && !heroLoopFrame) heroLoopFrame = requestAnimationFrame(keepHeroLoopClean);
+    };
+    const syncButton = () => {
+      const paused = userPaused || !motionAllowed() || heroMedia.failed;
+      motionButton.textContent = paused ? "Play video" : "Pause video";
+      motionButton.setAttribute("aria-pressed", String(paused));
+      motionButton.setAttribute("aria-label", paused ? "Play background videos" : "Pause background videos");
+    };
+    const syncMedia = (state,want) => {
+      want = Boolean(want && motionAllowed() && !userPaused && !state.failed && !document.hidden);
+      if (want === state.wanted) return;
+      state.wanted = want;
+      if (!want) { state.element.pause(); return; }
+      if (!state.loaded) {
+        if (!state.source) { state.failed=true; if (state === heroMedia) finishIntroReveal(); return; }
+        state.element.src = state.source;
+        state.loaded = true;
+      }
+      if (state.pending) return;
+      state.pending = true;
+      const attempt = ++state.attempt;
+      const promise = state.element.play();
+      if (!promise) { state.pending=false; return; }
+      promise.then(() => {
+        if (attempt !== state.attempt) return;
+        state.pending = false;
+        if (!state.wanted) state.element.pause();
+      }).catch(error => {
+        if (attempt !== state.attempt) return;
+        state.pending = false;
+        if (error.name !== "AbortError") {
+          state.failed = true;
+          if (state === heroMedia) finishIntroReveal();
+        }
+        state.wanted = null;
+        syncButton();
+        if (error.name === "AbortError") requestSceneUpdate();
+      });
+    };
+    const syncPlayback = () => {
+      syncMedia(heroMedia,heroOnScreen);
+      syncMedia(factsMedia,factsOnScreen);
+      syncButton();
+    };
+    const updateScene = () => {
+      frameRequested = false;
+      const distance = window.scrollY - sceneTop;
+      const raw = Math.max(0, Math.min(1, (distance / Math.max(1,heroHeight) - 0.20) / 0.85));
+      const progress = reducedMotion.matches ? (raw >= 0.5 ? 1 : 0) : raw * raw * (3 - 2 * raw);
+      videoLayer.style.opacity = String(1-progress);
+      document.body.classList.toggle("photo-visible",progress > 0.60);
+      heroOnScreen = progress < 0.96 && distance + window.innerHeight > 0;
+      factsOnScreen = progress > 0.04 && distance < heroHeight*1.95;
+      syncPlayback();
+    };
+    const requestSceneUpdate = () => {
+      if (!frameRequested) { frameRequested = true; requestAnimationFrame(updateScene); }
+    };
+
+    motionButton.addEventListener("click", () => {
+      if (userPaused || !motionAllowed() || heroMedia.failed) {
+        userPaused=false; userOptedIn=true; heroMedia.failed=false;
+      } else {
+        userPaused=true;
+        finishIntroReveal();
+      }
+      mediaStates.forEach(state => { state.wanted=null; });
+      syncPlayback();
+    });
+    mediaStates.forEach(state => {
+      state.element.addEventListener("error", () => {
+        state.failed=true; state.element.style.visibility="hidden";
+        if (state === heroMedia) finishIntroReveal();
+        syncButton();
+      });
+      state.element.addEventListener("playing", () => {
+        state.element.style.visibility="visible";
+        if (state === heroMedia) { startIntroReveal(); startHeroLoopWatcher(); }
+      });
+    });
+    window.addEventListener("scroll", requestSceneUpdate, {passive:true});
+    window.addEventListener("resize", () => { heroHeight=hero.offsetHeight; sceneTop=scene.getBoundingClientRect().top+window.scrollY; requestSceneUpdate(); }, {passive:true});
+    document.addEventListener("visibilitychange", () => { mediaStates.forEach(state => { state.wanted=null; }); syncPlayback(); });
+    reducedMotion.addEventListener("change", () => { userOptedIn=false; finishIntroReveal(); mediaStates.forEach(state => { state.wanted=null; }); requestSceneUpdate(); syncButton(); });
+    window.addEventListener("pageshow", () => {
+      if (introRevealActive) window.scrollTo(0,0);
+      requestSceneUpdate();
+    });
+    window.addEventListener("pagehide", () => {
+      if (heroLoopFrame) cancelAnimationFrame(heroLoopFrame);
+      heroLoopFrame=0;
+      mediaStates.forEach(state => { state.wanted=null; state.element.pause(); });
+    });
+    syncButton(); updateScene();
+  };
+  const buildAboutPanel = () => {
+    const panel = el("section", "about-panel");
+    panel.setAttribute("aria-labelledby", "about-story-title");
+    panel.append(el("p", "eyebrow", "A little more about me"));
+    const aboutTitle = el("h2", "about-title", "Beyond the projects.");
+    aboutTitle.id = "about-story-title";
+    panel.append(aboutTitle, el("p", "about-study", `${profile.program} / ${profile.university}`));
+    (profile.about || []).forEach(text => panel.append(el("p", "body-copy", text)));
+
+    const detailGrid = el("div", "about-detail-grid");
+    const education = el("section", "");
+    education.append(el("h3", "eyebrow", "Education"), el("p", "education-title", profile.education), el("p", "small-copy", profile.studyPeriod));
+    const skills = el("section", "");
+    skills.append(el("h3", "eyebrow", "Skills & interests"));
+    const skillList = el("ul", "skill-list");
+    (profile.skills || []).forEach(skill => skillList.append(el("li", "skill-chip", skill)));
+    skills.append(skillList);
+    detailGrid.append(education, skills);
+    panel.append(detailGrid);
+
+    const interests = el("section", "interests-section");
+    interests.append(el("h3", "eyebrow", "Hobbies and Interests"), el("p", "body-copy", profile.interests));
+    panel.append(interests);
+
+    const resumeSection = el("section", "resume-panel");
+    resumeSection.id = "resume";
+    const resumeCopy = el("div", "");
+    resumeCopy.append(el("h3", "section-title", "The resume version."));
+    if (resumeUrl) resumeCopy.append(el("p", "small-copy muted", "My education, experience, and skills in one place."));
+    resumeSection.append(resumeCopy, resumeUrl ? link("View resume ↗", resumeUrl, "button primary", true) : el("span", "coming-soon", "Resume coming soon"));
+    panel.append(resumeSection);
+    return panel;
+  };
+  const buildContactPanel = () => {
     const contactAddress = emailAddresses(profile.contactEmail || profile.email)[0] || "ethanniu79@gmail.com";
-    const contactPanel = el("section", "contact-panel"); contactPanel.id = "contact";
+    const contactPanel = el("section", "contact-panel");
+    contactPanel.id = "contact";
     contactPanel.setAttribute("aria-labelledby", "contact-title");
     contactPanel.append(el("p", "eyebrow", "Get in touch"));
-    const contactTitle = el("h2", "contact-title", "Send me a message."); contactTitle.id = "contact-title";
+    const contactTitle = el("h2", "contact-title", "Send me a message.");
+    contactTitle.id = "contact-title";
     contactPanel.append(contactTitle, el("p", "contact-intro", "Have a question or want to connect?"));
 
     const form = el("form", "contact-form");
     const emailField = el("label", "contact-field");
     emailField.append(el("span", "contact-label", "Your email"));
     const emailInput = el("input", "contact-input");
-    emailInput.type = "email"; emailInput.name = "email"; emailInput.autocomplete = "email";
-    emailInput.placeholder = "you@example.com"; emailInput.required = true;
+    emailInput.type = "email";
+    emailInput.name = "email";
+    emailInput.autocomplete = "email";
+    emailInput.placeholder = "you@example.com";
+    emailInput.required = true;
     emailField.append(emailInput);
 
     const messageField = el("label", "contact-field");
     messageField.append(el("span", "contact-label", "Message"));
     const messageInput = el("textarea", "contact-input contact-message");
-    messageInput.name = "message"; messageInput.rows = 6; messageInput.placeholder = "Write your message here"; messageInput.required = true;
+    messageInput.name = "message";
+    messageInput.rows = 6;
+    messageInput.placeholder = "Write your message here";
+    messageInput.required = true;
     messageField.append(messageInput);
 
-    const submit = el("button", "button primary contact-submit", "Send message"); submit.type = "submit";
+    const submit = el("button", "button primary contact-submit", "Send message");
+    submit.type = "submit";
     const direct = el("p", "contact-direct");
-    direct.append("Or email me directly at ", link(contactAddress, "mailto:" + encodeURIComponent(contactAddress).replace(/%40/gi,"@")));
+    direct.append("Or email me directly at ", link(contactAddress, "mailto:" + encodeURIComponent(contactAddress).replace(/%40/gi, "@")));
     form.append(emailField, messageField, submit);
     contactPanel.append(form, direct);
     form.addEventListener("submit", event => {
@@ -254,89 +457,7 @@
       const body = `From: ${emailInput.value.trim()}\n\n${messageInput.value.trim()}`;
       window.location.href = `mailto:${contactAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
-
-    about.append(panel, contactPanel);
-    const mapCredit = safeLink(backgrounds.mapCreditUrl);
-    if (backgrounds.mapCredit) about.append(mapCredit ? link(backgrounds.mapCredit,mapCredit,"map-credit",true) : el("p","map-credit",backgrounds.mapCredit));
-    scene.append(stage,hero,about); main.append(scene);
-
-    // Native scrolling, with only the background opacity linked to scroll position.
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const saveData = Boolean(navigator.connection && navigator.connection.saveData);
-    let userPaused = false;
-    let userOptedIn = false;
-    let playbackFailed = false;
-    let sourceLoaded = false;
-    let playPending = false;
-    let playAttempt = 0;
-    let lastWanted = null;
-    let frameRequested = false;
-    let heroHeight = hero.offsetHeight;
-    let sceneTop = scene.getBoundingClientRect().top + window.scrollY;
-    let heroOnScreen = true;
-    const motionAllowed = () => (!reducedMotion.matches && !saveData) || userOptedIn;
-    const syncButton = () => {
-      const paused = userPaused || !motionAllowed() || playbackFailed;
-      motionButton.textContent = paused ? "Play video" : "Pause video";
-      motionButton.setAttribute("aria-pressed", String(paused));
-      motionButton.setAttribute("aria-label", paused ? "Play background video" : "Pause background video");
-    };
-    const syncPlayback = () => {
-      const want = motionAllowed() && !userPaused && !playbackFailed && heroOnScreen && !document.hidden;
-      if (want === lastWanted) return;
-      lastWanted = want;
-      if (!want) { video.pause(); syncButton(); return; }
-      if (!sourceLoaded) {
-        const source = safeLink(backgrounds.video);
-        if (!source) { playbackFailed = true; syncButton(); return; }
-        video.src = source; sourceLoaded = true;
-      }
-      if (!playPending) {
-        playPending = true;
-        const attempt = ++playAttempt;
-        const promise = video.play();
-        if (promise) promise.then(() => {
-          if (attempt !== playAttempt) return;
-          playPending = false;
-          if (!lastWanted) video.pause();
-        }).catch(error => {
-          if (attempt !== playAttempt) return;
-          playPending = false;
-          if (error.name !== "AbortError") playbackFailed = true;
-          lastWanted = null;
-          syncButton();
-          if (error.name === "AbortError") requestSceneUpdate();
-        });
-      }
-      syncButton();
-    };
-    const updateScene = () => {
-      frameRequested = false;
-      const distance = window.scrollY - sceneTop;
-      const raw = Math.max(0, Math.min(1, (distance / Math.max(1,heroHeight) - 0.20) / 0.85));
-      const progress = reducedMotion.matches ? (raw >= 0.5 ? 1 : 0) : raw * raw * (3 - 2 * raw);
-      videoLayer.style.opacity = String(1-progress);
-      document.body.classList.toggle("map-visible",progress > 0.60);
-      heroOnScreen = progress < 0.995 && distance + window.innerHeight > 0;
-      syncPlayback();
-    };
-    const requestSceneUpdate = () => {
-      if (!frameRequested) { frameRequested = true; requestAnimationFrame(updateScene); }
-    };
-    motionButton.addEventListener("click", () => {
-      if (userPaused || !motionAllowed() || playbackFailed) { userPaused=false; userOptedIn=true; playbackFailed=false; }
-      else userPaused=true;
-      lastWanted=null; syncPlayback(); syncButton();
-    });
-    video.addEventListener("error", () => { playbackFailed=true; video.style.visibility="hidden"; syncButton(); });
-    video.addEventListener("playing", () => { video.style.visibility="visible"; });
-    window.addEventListener("scroll", requestSceneUpdate, {passive:true});
-    window.addEventListener("resize", () => { heroHeight=hero.offsetHeight; sceneTop=scene.getBoundingClientRect().top+window.scrollY; requestSceneUpdate(); }, {passive:true});
-    document.addEventListener("visibilitychange", () => { lastWanted=null; syncPlayback(); });
-    reducedMotion.addEventListener("change", () => { userOptedIn=false; lastWanted=null; requestSceneUpdate(); syncButton(); });
-    window.addEventListener("pageshow", requestSceneUpdate);
-    window.addEventListener("pagehide", () => { lastWanted = null; video.pause(); });
-    syncButton(); updateScene();
+    return contactPanel;
   };
   const makePlaceholder = (project, index, unavailable = false) => {
     const box = el("div", "media-placeholder");
@@ -531,6 +652,14 @@
     if (description) heading.append(el("p", "page-description", description));
     return heading;
   };
+  const renderAbout = () => {
+    setTitle("About Me", "More about Ethan Niu, his interests, education, skills, and experience.");
+    main.classList.add("inner-page", "about-page-main");
+    main.append(pageHeading("The person behind the work", "About Me", "A little context behind the maps, projects, and the person making them."));
+    const layout = el("div", "about-page-layout");
+    layout.append(buildAboutPanel(), buildContactPanel());
+    main.append(layout);
+  };
   const renderProjects = () => {
     setTitle("Projects");
     main.classList.add("inner-page");
@@ -550,7 +679,7 @@
     });
     if (!data.projects.length) grid.append(el("p", "empty-state", "Projects will appear here when they’re added."));
     main.append(grid);
-    const note = el("div", "end-note"); note.append(el("span", "", "A little context behind the work."), link("Get to know me →", "index.html#about")); main.append(note);
+    const note = el("div", "end-note"); note.append(el("span", "", "A little context behind the work."), link("Get to know me →", "about.html")); main.append(note);
   };
   const textSection = (title, text) => {
     const section = el("section", "text-section"); section.append(el("h2", "section-title", title), el("p", "body-copy", text)); return section;
@@ -589,6 +718,7 @@
     main.append(bottom);
   };
   if (page === "home") renderHome();
+  else if (page === "about") renderAbout();
   else if (page === "projects") renderProjects();
   else if (page === "project") renderProject();
 })();

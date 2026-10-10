@@ -2,13 +2,12 @@
 // Keep the double quotes, commas, and brackets. Save, then refresh your browser.
 // Put map images and PDFs in assets/. Use paths such as "assets/my-map.png".
 // Empty image, PDF, resume, and contact fields stay hidden or show a placeholder.
-// The Tokyo background is decoration, not one of your projects.
-// Your original video and map have not been changed.
+// The Waterloo ION and Tokyo train videos are decoration, not projects.
 window.PORTFOLIO = {
   "profile": {
     "name": "Ethan Niu",
     "chineseName": "牛",
-    "portrait": "assets/ethan-portrait-graduation.svg?v=20260930-1",
+    "portrait": "assets/ethan-portrait-mountains.webp?v=20261009-2",
     "program": "Systems Design Engineering",
     "university": "University of Waterloo",
     "introduction": "Maps, research, and projects that explore the places around us.",
@@ -16,7 +15,16 @@ window.PORTFOLIO = {
       "lead": "Seeking Summer 2027 ",
       "emphasis": "Internship Opportunities."
     },
-    "availability": "Interested in TTC, Metrolinx, BA Consulting Group, etc...",
+    "quickFacts": [
+      "systems design engineering at University of Waterloo",
+      {
+        "before": "working on improving ",
+        "linkText": "accessibility across Toronto",
+        "projectId": "map-project-one"
+      },
+      "currently working to become literate with chinese characters (加油!)",
+      "avid toronto maple leafs and tottenham hotspur fan"
+    ],
     "about": [
       "I'm a first year student at the University of Waterloo studying Systems Design Engineering (SYDE) with an interest in public transportation, urban infastructure, map design, and SWE.",
       "Driven by my personal experiences with transit across Toronto and visits to other cities, I enjoy pursuing personal projects which model how well-planned transportation and thoughtful urban accessibility can improve cities and enhance people’s quality of life."
@@ -112,12 +120,14 @@ window.PORTFOLIO = {
     }
   ],
   "backgrounds": {
-    "video": "assets/tokyo-trains.mp4",
-    "poster": "assets/tokyo-poster.jpg",
-    "map": "assets/tokyo-subway-map.png",
-    "videoPosition": "55% 50%",
-    "mapPosition": "50% 48%",
-    "mapCredit": "Tokyo rail map · Jug Cerović / inat.fr",
-    "mapCreditUrl": "https://www.inat.fr/"
+    "video": "assets/waterloo-ion-hero.mp4?v=20261009-2",
+    "poster": "assets/waterloo-ion-poster.jpg?v=20261009-2",
+    "factsVideo": "assets/tokyo-trains.mp4",
+    "factsPoster": "assets/tokyo-poster.jpg",
+    "videoPosition": "50% 50%",
+    "factsVideoPosition": "55% 50%",
+    "heroRevealStart": 2.9,
+    "heroRevealEnd": 4.7,
+    "heroLoopEnd": 12.18
   }
 };

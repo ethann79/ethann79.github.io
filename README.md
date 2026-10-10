@@ -10,13 +10,12 @@ The temporary preview at http://127.0.0.1:4173/ works only while the local previ
 
 ## The layout
 
-- **Home**: your greeting over silent Tokyo train footage, with one short sentence and a Projects button near the bottom.
-- **Scroll down**: the video fades into the Tokyo subway map, with About, education, skills, contact details, and a resume section.
-- **Projects**: a subtle white-and-grey geometric background with two editable project cards.
+- **Home**: your Waterloo ION recording opens on the crossing, then the real train reveals your greeting as its rear edge passes.
+- **Scroll down**: the ION video crossfades into the Tokyo train video behind a short editable quick-facts card.
+- **About Me**: a separate page for your biography, education, skills, interests, resume, and contact form.
+- **Projects**: a subtle white-and-grey geometric background with editable project cards.
 - **Project details**: an introduction and project facts above the full map; process and outcomes below it.
-- The top navigation has **Home** and **Projects**, with a **Resume** button on the right.
-
-The old about.html address simply redirects to the About section of Home. It is not a third navigation tab.
+- The Chinese character **牛** returns to Home. The top navigation has **Projects** and **About Me**, with a **Resume** button on the right.
 
 ## Edit your text
 
@@ -33,13 +32,13 @@ Near the top of the file:
 "introduction": "Maps, research, and projects that explore the places around us.",
 ```
 
-`greeting` sets the short phrase above your name. `introduction` is the single sentence near the bottom of the video. The `about` paragraphs, education, skills, interests, and internship interests appear in the map section. These are placeholders until you replace them.
+`greeting` sets the short phrase above your name. `introduction` is the single sentence near the bottom of the video. `quickFacts` contains the bullets shown after scrolling on Home. A quick fact can be plain text or use `before`, `linkText`, and `projectId` to link part of the sentence to one of your projects. The `about` paragraphs, education, skills, and interests appear on the separate About Me page.
 
 Keep the quotation marks, commas, and brackets. Use single quotes inside your sentences, or escape a double quote as `\"`. Use `\n` inside a string for a line break. If the site stops showing content after an edit, undo the last change and check for a missing quote or comma. Keep a backup of content.js before larger edits.
 
-## Add the two projects later
+## Edit or add projects
 
-Find the two objects inside `projects` in content.js. For each one, edit:
+Find the objects inside `projects` in content.js. For each one, edit:
 
 | Field | What to enter |
 | --- | --- |
@@ -72,7 +71,7 @@ Project 2 now uses `fantasy-ttc-map.png` for its full-resolution map and `fantas
 
 Only fill in pdf if that file exists. Use a public https:// address for an interactive map in liveUrl or a source-code page in sourceUrl. Empty links are not shown.
 
-Your project maps are displayed without cropping. A project with `"zoomable": true` opens in the built-in pan-and-zoom viewer; other project images can still be clicked to open at full size. The Tokyo background map is decoration and is not presented as one of your own projects.
+Your project maps are displayed without cropping. A project with `"zoomable": true` opens in the built-in pan-and-zoom viewer; other project images can still be clicked to open at full size.
 
 To add a third project later, duplicate one whole project object, give it a unique lowercase-hyphenated `id`, and separate it with a comma. Its detail page is created automatically. Rearrange the objects to rearrange the cards.
 
@@ -96,31 +95,30 @@ Contact fields also accept convenient formats:
 
 The current resume is stored at `assets/Ethan-Niu-Resume.pdf`. Replace that file with an updated PDF using the same filename whenever the resume changes.
 
-The Projects background is made entirely with CSS gradients and simple geometry; it does not use or reproduce the watermarked reference image. It needs no additional image download.
-The sample email above is an instruction only; no fake address is included in the site. Leave fields empty until you have real links. Until a resume is added, the top-right button takes visitors to the clearly labelled resume placeholder on Home.
+The Projects and About Me backgrounds are made entirely with CSS gradients and simple geometry; they do not use or reproduce the watermarked reference image. They need no additional image download.
+The sample email above is an instruction only; no fake address is included in the site. Leave fields empty until you have real links. Until a resume is added, the top-right button takes visitors to the clearly labelled resume placeholder on the About Me page.
 
 ## Backgrounds and playback
 
-The `backgrounds` section in content.js contains the video, poster, and map filenames. `videoPosition` and `mapPosition` adjust which part remains visible when the background is cropped to fill the screen. For example, `"60% 50%"` places the crop a little further right.
+The `backgrounds` section in content.js contains the two homepage video and poster filenames. `videoPosition` and `factsVideoPosition` adjust which part remains visible when a video is cropped to fill the screen. For example, `"60% 50%"` places the crop a little further right. `heroRevealStart` and `heroRevealEnd` keep the greeting reveal aligned to the ION train’s rear edge. `heroLoopEnd` restarts the ION clip at a clean frame before the person enters from the left.
 
+- **waterloo-ion-hero.mp4**: a silent, web-ready crop of your ION recording used for the opening hero. After its first pass reveals the greeting, it continues looping without hiding the words again.
+- **waterloo-ion-poster.jpg**: the empty-crossing still shown while the ION video loads or motion is disabled.
 - **tokyo-trains.mp4**: a 20-second H.264 web loop from approximately 0:53–1:13 of your recording, with a one-second blend across the loop join. The audio track was removed from this web copy. It is 1920×1080 at 30 fps, about 21.5 MB, with HDR converted to standard SDR colour for browser playback.
-- **tokyo-poster.jpg**: a still extracted from the web video. It appears before playback and when motion is disabled.
-- **tokyo-subway-map.png**: a copy of the exact map you supplied. The source file was not modified.
+- **tokyo-poster.jpg**: a still extracted from the Tokyo video. It appears behind quick facts before playback and when motion is disabled.
 - **social-preview.png**: a matching portfolio image prepared for link previews.
 
 Your original MOV in Downloads was not changed. Sound could be added later by preparing another copy from that original.
 
-The video has a small Pause/Play button. It pauses when the hero leaves view or the browser tab is hidden. People with reduced-motion or data-saving preferences start with the still image; they can explicitly choose Play. Reduced-motion mode also removes the animated scroll transition. Autoplay restrictions can cause the still image and Play button to appear instead; the rest of the site continues working.
+The opening train reveal is skipped for people with reduced-motion preferences. The Pause/Play button controls both background videos, and videos pause when they are off screen or the browser tab is hidden. People with reduced-motion or data-saving preferences start with still images and can explicitly choose Play. Reduced-motion mode also removes the animated scroll transition. Autoplay restrictions can cause a still image and Play button to appear instead; the rest of the site continues working.
 
 ## Appearance
 
-The first lines of **styles.css** control the theme colors and fonts. Home has a full-height background; the project gallery uses a subtle white-and-grey geometric pattern, while project detail pages stay white. Text, cards, and navigation adapt to narrower screens. The backgrounds crop to fill the screen; the actual project maps do not crop.
+The first lines of **styles.css** control the theme colors and fonts. Home has two full-height video backgrounds; the Projects and About Me pages use a subtle white-and-grey geometric pattern, while project detail pages stay white. Text, cards, and navigation adapt to narrower screens. The backgrounds crop to fill the screen; the actual project maps do not crop.
 
-The scroll transition uses normal scrolling and gradually adjusts background opacity over a slightly longer distance into About. No special mouse, scroll plugin, framework, or login is needed.
+The scroll transition uses normal scrolling and gradually fades the Waterloo ION video into the Tokyo video before the quick-facts card. No special mouse, scroll plugin, framework, or login is needed.
 
 ## Credits and publishing later
-
-The supplied Tokyo rail map identifies **Jug Cerović / inat.fr**. A credit appears beneath the About panel, and the original credit remains in the map image. Before publishing publicly, verify that you have permission to use this particular map; including a credit does not by itself grant reuse rights.
 
 Review all placeholder text and links, image descriptions, map data credits, and your resume's personal details before sharing. Keep sensitive or restricted files out of assets.
 
@@ -128,10 +126,10 @@ These files can be hosted on a static web host. This draft is not a content mana
 
 ## Files
 
-- index.html — Home, video, and About section
-- projects.html — two-card project gallery
+- index.html — Home, video, and quick-facts section
+- projects.html — project gallery
 - project.html — reusable project detail page
-- about.html — compatibility redirect to Home's About section
+- about.html — About Me, resume, and contact page
 - content.js — personal text, project data, file paths, and contact links
 - site.js — rendering, navigation, media controls, and scroll transition
 - styles.css — colors, spacing, and layouts
